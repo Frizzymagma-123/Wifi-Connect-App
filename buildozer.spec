@@ -12,6 +12,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #打包image目录下的文件 Pack files in the image directory
 #source.include_patterns = image/*
 version = 0.0.1
+log_level = 2
 #依赖库,后二为打包需要 The last two are needed for packaging
 requirements = python3,kivy,flask
 #icon.filename = icon.png
