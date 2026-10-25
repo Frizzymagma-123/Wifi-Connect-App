@@ -28,11 +28,21 @@ jobs:
         python3 -m pip install --upgrade pip setuptools wheel
         pip install buildozer cython==0.29.33 kivy flask
 
-    - name: Accept Android SDK Licenses
+    - name: Accept Android SDK Licenses & Inject AIDL Fix
       run: |
+        # 1. Create the directories ahead of time so Buildozer doesn't get lost
         mkdir -p $HOME/.android
+        mkdir -p $HOME/.buildozer/android/platform/android-sdk/build-tools/33.0.0/
+        
+        # 2. Handle analytics file setups
         touch $HOME/.android/analytics.settings
         echo "count=0" > $HOME/.android/analytics.settings
+        
+        # 3. Inject the missing AIDL tool straight into Buildozer's hidden SDK sandbox folder
+        sudo cp $(which aidl) $HOME/.buildozer/android/platform/android-sdk/build-tools/33.0.0/aidl
+        sudo chmod +x $HOME/.buildozer/android/platform/android-sdk/build-tools/33.0.0/aidl
+        
+        # 4. Confirm Android licenses automatically
         yes | sdkmanager --licenses || true
 
     - name: Execute Buildozer Engine
