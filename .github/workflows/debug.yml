@@ -21,7 +21,7 @@ jobs:
     - name: Install System Layout Tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip aidl python3-pip autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev cmake
+        sudo apt-get install -y git zip unzip aidl python3-pip python3-venv autoconf libtool pkg-config zlib1g-dev libffi-dev libssl-dev libncurses5 cmake
 
     - name: Install Buildozer Core
       run: |
