@@ -18,6 +18,13 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Setup Official Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Android SDK Build-Tools and AIDL
+      run: |
+        sdkmanager "platform-tools" "build-tools;33.0.0" "platforms;android-33"
+
     - name: Install System Layout Tools
       run: |
         sudo apt-get update
@@ -28,26 +35,11 @@ jobs:
         python3 -m pip install --upgrade pip setuptools wheel
         pip install buildozer cython==0.29.33 kivy flask
 
-    - name: Pre-Configure Workspace Directories
+    - name: Execute Buildozer Engine
       run: |
-        mkdir -p $HOME/.android
-        touch $HOME/.android/analytics.settings
-        echo "count=0" > $HOME/.android/analytics.settings
-
-    - name: Execute Buildozer Engine with Auto-Injection
-      run: |
-        # Start buildozer down the line to populate SDK folder structures automatically
-        buildozer android release || true
-        
-        # Inject missing system tools cleanly into Buildozer's newly created sandbox folders
-        TARGET_DIR=$(find $HOME/.buildozer/android/platform/android-sdk/build-tools/ -maxdepth 1 -type d | sort -V | tail -n 1)
-        if [ -n "$TARGET_DIR" ]; then
-          echo "Injecting layout tools into $TARGET_DIR"
-          sudo cp $(which aidl) "$TARGET_DIR/aidl"
-          sudo chmod +x "$TARGET_DIR/aidl"
-        fi
-        
-        # Finalise compilation smoothly
+        # Force Buildozer to use the pre-configured system Android SDK paths instead of its own sandbox
+        export ANDROIDSDK=$ANDROID_HOME
+        export ANDROIDNDK=$ANDROID_HOME/ndk-bundle
         buildozer -v android debug
 
     - name: Upload Finished APK
